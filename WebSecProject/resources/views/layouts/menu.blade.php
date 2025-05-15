@@ -1,8 +1,8 @@
-<nav class="navbar navbar-expand-sm bg-light">
+<nav class="navbar navbar-expand-sm bg-dark navbar-dark">
     <div class="container-fluid">
         <ul class="navbar-nav">
             <li class="nav-item">
-                <a class="nav-link" href="./">Home</a>
+                <a class="navbar-brand" href="./">BiT</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="{{route('products_list')}}">Products</a>
@@ -32,7 +32,7 @@
             @endcan
             <li class="nav-item">
                 <a class="nav-link" href="{{route('bought_products')}}">Bought Products List</a>
-            </li>
+            </li> --}}
         </ul>
         <ul class="navbar-nav">
             @auth
@@ -49,7 +49,7 @@
             <li class="nav-item">
                 <a class="nav-link" href="{{route('register')}}">Register</a>
             </li>
-            @endauth --}}
+            @endauth
         </ul>
     </div>
 </nav>

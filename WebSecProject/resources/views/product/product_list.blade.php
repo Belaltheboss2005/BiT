@@ -20,7 +20,7 @@
                         <p class="card-text mb-1"><strong>Seller:</strong> {{ $product->seller }}</p>
                         <p class="card-text small text-muted">{{ Str::limit($product->description, 80) }}</p>
                         <div class="mt-auto">
-                            <a href="#" class="btn btn-primary w-100">View Details</a>
+                            <a href="#" class="btn btn-primary w-100">Add To Cart</a>
                         </div>
                     </div>
                     <div class="card-footer text-muted small">
