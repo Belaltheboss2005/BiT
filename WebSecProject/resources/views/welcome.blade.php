@@ -1,7 +1,24 @@
 @extends('layouts.master')
 @section('title', 'Welcome')
 @section('content')
-    <div class="container py-5">
+    <div class="container py-5" style="margin-top: 20px;">
+        @if(session('success'))
+            <div class="alert alert-success" id="success-alert">
+                {{ session('success') }}
+            </div>
+            <script>
+                setTimeout(function() {
+                    var alert = document.getElementById('success-alert');
+                    if(alert) {
+                        alert.style.transition = 'opacity 1s';
+                        alert.style.opacity = 0;
+                        setTimeout(function() { alert.style.display = 'none'; }, 1000);
+                    }
+                }, 5000);
+            </script>
+        @endif
+    </div>
+    <div class="container py-5" style="margin-top: 20px;">
         <div class="row justify-content-center">
             <div class="col-md-8">
                 <div class="card shadow-lg border-0">
