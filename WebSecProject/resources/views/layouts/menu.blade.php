@@ -7,6 +7,13 @@
             <li class="nav-item">
                 <a class="nav-link" href="{{route('products_list')}}">Products</a>
             </li>
+            @auth
+            @if (auth()->user()->hasRole('Admin'))
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('users.manage') }}">Users</a>
+                </li>
+            @endif
+        @endauth
             {{-- <li class="nav-item">
                 <a class="nav-link" href="./even">Even Numbers</a>
             </li>

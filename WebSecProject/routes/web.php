@@ -17,4 +17,11 @@ Route::post('login', [UserController::class, 'doLogin'])->name('do_login');
 Route::get('logout', [UserController::class, 'doLogout'])->name('do_logout');
 
 Route::get('profile/{user?}', [UserController::class, 'profile'])->name('profile');
-Route::get('users', [UserController::class, 'list'])->name('users');
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/users', [UserController::class, 'manageUsers'])->name('users.manage');
+    Route::post('/users/store', [UserController::class, 'store'])->name('users.store');
+    Route::post('/users/update', [UserController::class, 'update'])->name('users.update');
+    Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
+    // ... (other routes)
+});

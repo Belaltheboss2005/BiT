@@ -96,6 +96,95 @@ class UserController extends Controller
         return redirect()->route('login')->with('success', 'Registration successful!');
     }
 
+
+
+    // public function index()
+    // {
+    //     if (!Auth::user()->hasPermissionTo('show-users')) {
+    //         abort(403, 'Unauthorized');
+    //     }
+    //     $users = User::all();
+    //     return view('users.list', compact('users'));
+    // }
+    public function manageUsers(Request $request)
+{
+    if (!Auth::user()->hasPermissionTo('show-users')) {
+        abort(403, 'Unauthorized');
+    }
+
+    $query = User::with('roles');
+
+    // Search functionality
+    if ($request->has('keywords') && !empty($request->keywords)) {
+        $keywords = $request->keywords;
+        $query->where(function ($q) use ($keywords) {
+            $q->where('name', 'like', "%{$keywords}%")
+              ->orWhere('email', 'like', "%{$keywords}%");
+        });
+    }
+
+    $users = $query->paginate(10); // Pagination with 10 items per page
+
+    $action = $request->input('action', 'list');
+    $userToEdit = null;
+
+    if ($action === 'edit' && $request->has('user_id')) {
+        $userToEdit = User::with('roles')->findOrFail($request->input('user_id'));
+    } elseif ($action === 'add') {
+        return view('users.list', compact('users', 'action')); // Show add form
+    }
+
+    return view('users.list', compact('users', 'action', 'userToEdit'));
+}
+
+    public function store(Request $request)
+    {
+        if (!Auth::user()->hasPermissionTo('add-users')) {
+            abort(403, 'Unauthorized');
+        }
+        $request->validate([
+            'name' => ['required', 'string', 'min:5'],
+            'email' => ['required', 'email', 'unique:users'],
+            'password' => ['required', 'confirmed', Password::min(5)->numbers()->letters()->mixedCase()->symbols()],
+        ]);
+
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => bcrypt($request->password),
+            'credit' => 80000,
+        ]);
+
+        $user->assignRole('customer');
+
+        return redirect()->route('users.manage')->with('success', 'User created!');
+    }
+
+    public function update(Request $request)
+    {
+        if (!Auth::user()->hasPermissionTo('edit-users')) {
+            abort(403, 'Unauthorized');
+        }
+        $user = User::findOrFail($request->input('user_id'));
+        $request->validate([
+            'name' => ['required', 'string', 'min:5'],
+            'email' => ['required', 'email', 'unique:users,email,' . $user->id],
+        ]);
+
+        $user->update($request->only(['name', 'email']));
+        return redirect()->route('users.manage')->with('success', 'User updated!');
+    }
+    public function destroy(User $user)
+    {
+        if (!Auth::user()->hasPermissionTo('delete-users')) {
+            abort(403, 'Unauthorized');
+        }
+        $user->delete();
+        return redirect()->route('users.manage')->with('success', 'User deleted!');
+    }
+
+
+
     public function profile(Request $request, User $user = null) {
 
         $user = $user??auth()->user();
@@ -114,12 +203,23 @@ class UserController extends Controller
         }
 
         return view('users.profile', compact('user', 'permissions'));
-    }
+     }
     public function doLogout(Request $request) {
 
     	Auth::logout();
 
         return redirect('/');
-    }
 
+    }
+    
+
+  
+
+    
+
+ 
 }
+
+
+
+
