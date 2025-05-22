@@ -57,6 +57,11 @@
                 <a class="nav-link" href="{{route('register')}}">Register</a>
             </li>
             @endauth
+            <li class="nav-item">
+                <a class="nav-link" href="{{ route('cart.view') }}" style="color: #ff5722; font-weight: bold;">
+                    <i class="bi bi-cart"></i> Cart
+                </a>
+            </li>
         </ul>
     </div>
 </nav>

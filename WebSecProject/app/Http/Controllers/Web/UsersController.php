@@ -1,6 +1,7 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Web;
+
 
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Mail;
@@ -16,8 +17,10 @@ use Carbon\Carbon;
 use Artisan;
 use Laravel\Socialite\Facades\Socialite;
 use App\Models\User;
+use App\Http\Controllers\Controller;
 
-class UserController extends Controller
+
+class UsersController extends Controller
 {
     use ValidatesRequests;
 
@@ -211,13 +214,13 @@ class UserController extends Controller
         return redirect('/');
 
     }
-    
 
-  
 
-    
 
- 
+
+
+
+
 }
 
 

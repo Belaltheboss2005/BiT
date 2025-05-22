@@ -9,8 +9,9 @@
                 <div class="card-body bg-light">
                     <h2 class="mb-4 text-center" style="color:#ff5722; font-weight:bold;">Login</h2>
                     @if(session('success'))
-                        <div class="alert alert-success">
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
                             {{ session('success') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     @endif
                     @if($errors->any())
