@@ -18,8 +18,9 @@ class Product extends Model
         'stock',
         'model',
         'description',
-        'seller',
+        'seller_id',
         'image',
+        'status',
         'created_at',
         'updated_at',
         'deleted_at',
@@ -30,4 +31,9 @@ class Product extends Model
         'updated_at',
         'deleted_at',
     ];
+
+    public function seller()
+    {
+        return $this->belongsTo(User::class, 'seller_id');
+    }
 }

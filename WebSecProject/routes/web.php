@@ -34,5 +34,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/checkout', [ProductsController::class, 'viewCheckout'])->name('checkout.view');
     Route::post('/checkout', [ProductsController::class, 'placeOrder'])->name('checkout.placeOrder');
     Route::get('/orders', [ProductsController::class, 'viewOrders'])->name('orders.view');
-
+    //seller
+    Route::get('/seller/products', [ProductsController::class, 'manage'])->name('products.seller_list');
+    Route::get('/seller/products/create', [ProductsController::class, 'create'])->name('products.create');
+    Route::post('/seller/products/store', [ProductsController::class, 'store'])->name('products.store');
+    Route::get('/seller/products/{product}/edit', [ProductsController::class, 'edit'])->name('products.edit');
+    Route::put('/seller/products/{product}', [ProductsController::class, 'update'])->name('products.update');
+    Route::delete('/seller/products/{product}', [ProductsController::class, 'destroy'])->name('products.destroy');
 });

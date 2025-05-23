@@ -116,6 +116,88 @@ class ProductsController extends Controller
         }
         $cartItem->save();
         return redirect()->route('cart.view');
+
+    }
+    public function create()
+    {
+        if (!Auth::user()->hasRole('Seller')) {
+            abort(403, 'Unauthorized');
+        }
+        return view('products.create');
+    }
+
+    public function store(Request $request)
+    {
+        if (!Auth::user()->hasRole('Seller')) {
+            abort(403, 'Unauthorized');
+        }
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'price' => 'required|numeric',
+            'description' => 'nullable|string',
+        ]);
+
+        $product = Product::create([
+            'name' => $request->name,
+            'price' => $request->price,
+            'description' => $request->description,
+            'seller_id' => Auth::id(),
+            'status' => 'pending', // بيبدأ كـ Pending لحد ما Employee يوافق
+        ]);
+
+        // Placeholder لإرسال طلب لـ Employee (يمكن تكمله لاحقًا)
+        // مثال: إضافة سجل طلب في جدول requests
+        // Request::create(['product_id' => $product->id, 'status' => 'pending']);
+
+        return redirect()->route('products.list')->with('success', 'Product created and pending approval.');
+    }
+
+    public function edit(Product $product)
+    {
+        if (!Auth::user()->hasRole('Seller') || $product->seller_id !== Auth::id()) {
+            abort(403, 'Unauthorized');
+        }
+        return view('products.edit', compact('product'));
+    }
+
+    public function update(Request $request, Product $product)
+    {
+        if (!Auth::user()->hasRole('Seller') || $product->seller_id !== Auth::id()) {
+            abort(403, 'Unauthorized');
+        }
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'price' => 'required|numeric',
+            'description' => 'nullable|string',
+        ]);
+
+        $product->update([
+            'name' => $request->name,
+            'price' => $request->price,
+            'description' => $request->description,
+            'status' => 'pending', // يرجع لـ Pending بعد التعديل
+        ]);
+
+        // Placeholder لإرسال طلب تعديل لـ Employee
+        // Request::where('product_id', $product->id)->update(['status' => 'pending']);
+
+        return redirect()->route('products.list')->with('success', 'Product updated and pending approval.');
+    }
+
+    public function destroy(Product $product)
+    {
+        if (!Auth::user()->hasRole('Seller') || $product->seller_id !== Auth::id()) {
+            abort(403, 'Unauthorized');
+        }
+
+        $product->delete();
+
+        // Placeholder لإشعار Employee بحذف المنتج
+        // Request::where('product_id', $product->id)->delete();
+
+        return redirect()->route('products.list')->with('success', 'Product deleted.');
     }
 
     public function viewCheckout()
@@ -195,3 +277,37 @@ class ProductsController extends Controller
         return view('product.order', compact('orders'));
     }
 }
+
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// <!--
+// namespace App\Http\Controllers;
+
+// use App\Models\Product;
+// use Illuminate\Http\Request;
+
+// class ProductController extends Controller -->
+// <!-- // { -->
+ //     // Display a listing of the products
+//     public function index()
+//     {
+//         $products = Product::all();
+//         return view('product.product_list', compact('products'));
+//     } -->
+
+//     // Other CRUD methods can be added here as needed
+// } -->
