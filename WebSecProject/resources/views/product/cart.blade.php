@@ -12,7 +12,10 @@
     @endif
     @if(isset($cartItems) && count($cartItems) > 0)
         <div class="bg-white p-4 rounded shadow-sm">
-            <h2 class="mb-4" style="font-weight: bold; color: #222;">Shopping Cart</h2>
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="mb-0" style="font-weight: bold; color: #222;">Shopping Cart</h2>
+                <a href="{{ route('checkout.view') }}" class="btn btn-success px-4 py-2 fw-bold">Checkout</a>
+            </div>
             <a href="#" class="text-primary small mb-3 d-inline-block">Deselect all items</a>
             <hr>
             @php $subtotal = 0; $totalQty = 0; @endphp
@@ -30,8 +33,7 @@
                         <div class="fw-bold fs-5 mb-1">{{ $item->product->name }}</div>
                         <div class="text-primary">{{ $item->product->stock }} left in stock</div>
                         <div class="mb-1 small">sold by: <span class="text-primary">{{ $item->product->seller }}</span></div>
-                        <div class="mb-1 small"><b>Color:</b> {{ $item->product->model }}</div>
-                        <div class="mb-1 small text-success">15 days Returnable</div>
+                        <div class="mb-1 small"><b>Model:</b> {{ $item->product->model }}</div>
                         <div class="d-flex align-items-center mt-2">
                             <form method="POST" action="{{ route('cart.updateQuantity', $item->id) }}" class="d-flex align-items-center gap-2">
                                 @csrf

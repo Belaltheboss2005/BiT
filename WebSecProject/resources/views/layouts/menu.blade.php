@@ -4,16 +4,21 @@
             <li class="nav-item">
                 <a class="navbar-brand" href="./">BiT</a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{{route('products_list')}}">Products</a>
-            </li>
             @auth
-            @if (auth()->user()->hasRole('Admin'))
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ route('users.manage') }}">Users</a>
-                </li>
-            @endif
-        @endauth
+                @if (auth()->user()->hasRole('Customer'))
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{route('products_list')}}">Products</a>
+                    </li>
+                    <li class="nav-item">
+                            <a class="nav-link" href="{{ route('orders.view') }}">Orders</a>
+                    </li>
+                @endif
+                @if (auth()->user()->hasRole('Admin'))
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('users.manage') }}">Users</a>
+                    </li>
+                @endif
+            @endauth
             {{-- <li class="nav-item">
                 <a class="nav-link" href="./even">Even Numbers</a>
             </li>

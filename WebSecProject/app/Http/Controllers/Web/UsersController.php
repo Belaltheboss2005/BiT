@@ -17,12 +17,17 @@ use Carbon\Carbon;
 use Artisan;
 use Laravel\Socialite\Facades\Socialite;
 use App\Models\User;
+use App\Models\Cart;
+use App\Models\CartItem;
+use App\Models\Product;
+use App\Models\Order;
 use App\Http\Controllers\Controller;
 
 
 class UsersController extends Controller
 {
     use ValidatesRequests;
+
 
 
     public function login(Request $request) {
@@ -72,6 +77,7 @@ class UsersController extends Controller
             return redirect()->back()->withInput($request->input())->withErrors('Invalid registration information.');
         }
 
+
         $user = new User();
         $user->name = $request->name;
         $user->email = $request->email;
@@ -80,8 +86,10 @@ class UsersController extends Controller
         $user->save();
         $user->assignRole('customer');
 
-        // Assign the "customer" role to the user
-
+        // Create a cart for the new user
+        $user_id = new Cart();
+        $user_id->user_id = $user->id;
+        $user_id->save();
 
         // Check email verification preference
         // if ($request->email_verification === 'now') {
