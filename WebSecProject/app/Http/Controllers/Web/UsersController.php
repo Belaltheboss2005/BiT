@@ -33,29 +33,51 @@ class UsersController extends Controller
     public function login(Request $request) {
         return view('users.login');
     }
-
     public function doLogin(Request $request)
-    {
-        $user = User::where('email', $request->email)->first();
+{
+    $credentials = $request->only('email', 'password');
 
-        if ($user->hasRole('Banned')) {
-            return redirect()->route('banned_page');
+    if (Auth::attempt($credentials)) {
+        $request->session()->regenerate();
+
+        $user = Auth::user();
+        if ($user->hasRole('Seller')) {
+            return redirect()->intended('/seller/manage');
+        } elseif ($user->hasRole('Admin')) {
+            return redirect()->intended('/users');
+        } else {
+            // افتراضيًا، لو Customer أو أي دور تاني
+            return redirect()->intended('/products');
         }
-
-        // if (!$user || !$user->email_verified_at) {
-        //     return redirect()->back()->withInput($request->input())
-        //         ->withErrors('Your email is not verified.');
-        // }
-
-        if (!Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
-            return redirect()->back()->withInput($request->input())
-                ->withErrors('Invalid login information.');
-        }
-
-        Auth::setUser($user);
-
-        return redirect('/')->with('success', 'Login successful!');
     }
+
+    return back()->withErrors([
+        'email' => 'The provided credentials do not match our records.',
+    ]);
+}
+
+    // public function doLogin(Request $request)
+    // {
+    //     $user = User::where('email', $request->email)->first();
+
+    //     if ($user->hasRole('Banned')) {
+    //         return redirect()->route('banned_page');
+    //     }
+
+    //     // if (!$user || !$user->email_verified_at) {
+    //     //     return redirect()->back()->withInput($request->input())
+    //     //         ->withErrors('Your email is not verified.');
+    //     // }
+
+    //     if (!Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
+    //         return redirect()->back()->withInput($request->input())
+    //             ->withErrors('Invalid login information.');
+    //     }
+
+    //     Auth::setUser($user);
+
+    //     return redirect('/')->with('success', 'Login successful!');
+    // }
 
 
 

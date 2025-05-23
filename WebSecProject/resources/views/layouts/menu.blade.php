@@ -13,7 +13,12 @@
                             <a class="nav-link" href="{{ route('orders.view') }}">Orders</a>
                     </li>
                 @endif
-                @if (auth()->user()->hasRole('Admin'))
+                @if (auth()->user()->hasRole('Seller'))
+                       <li class="nav-item">
+                             <a class="nav-link" href="{{ route('seller.manage') }}">Manage Products</a>
+                      </li>
+               @endif
+                  @if (auth()->user()->hasRole('Admin'))
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('users.manage') }}">Users</a>
                     </li>
