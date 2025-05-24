@@ -15,6 +15,7 @@ class OrderItem extends Model
         'quantity',
         'price',
         'total',
+        'status', // add status for return/cancel logic
     ];
     public $timestamps = true;
 

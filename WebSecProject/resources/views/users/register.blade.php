@@ -35,6 +35,15 @@
                             <label for="password_confirmation" class="form-label">Confirm Password</label>
                             <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" required>
                         </div>
+                        <div class="form-group mb-2">
+                            <label for="email_verification" class="form-label">Email Verification:</label>
+                            <div>
+                                <input type="radio" id="verify_now" name="email_verification" value="now" required>
+                                <label for="verify_now">Now</label>
+                                <input type="radio" id="verify_later" name="email_verification" value="later" required>
+                                <label for="verify_later">Later</label>
+                            </div>
+                        </div>
                         <button type="submit" class="btn btn-primary w-100">Register</button>
                     </form>
                 </div>

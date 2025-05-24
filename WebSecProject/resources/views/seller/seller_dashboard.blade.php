@@ -66,6 +66,7 @@
                             <tr>
                                 <th>Product Name</th>
                                 <th>Total Sold</th>
+                                <th>Total Sales (Amount)</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -73,6 +74,12 @@
                                 <tr>
                                     <td>{{ $product->name }}</td>
                                     <td>{{ $salesCounts[$product->id] ?? 0 }}</td>
+                                    <td>
+                                        @php
+                                            $totalSales = ($salesCounts[$product->id] ?? 0) * $product->price;
+                                        @endphp
+                                        ${{ number_format($totalSales, 2) }}
+                                    </td>
                                 </tr>
                             @endforeach
                         </tbody>

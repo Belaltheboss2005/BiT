@@ -59,12 +59,27 @@ use App\Http\Controllers\Web\SpatieController;
 
 Route::get('/', [UsersController::class, 'welcomePage'])->name('welcome');
 
+// Registration and Authentication routes
 Route::get('register', [UsersController::class, 'register'])->name('register');
 Route::post('do_Register', [UsersController::class, 'doRegister'])->name('do_register');
 Route::get('login', [UsersController::class, 'login'])->name('login');
 Route::post('login', [UsersController::class, 'doLogin'])->name('do_login');
 Route::get('logout', [UsersController::class, 'doLogout'])->name('do_logout');
 Route::get('profile/{user?}', [UsersController::class, 'profile'])->name('profile');
+
+// email verification route
+Route::get('verify', [UsersController::class, 'verify'])->name('verify');
+Route::post('resend-verification', [UsersController::class, 'resendVerificationEmail'])->name('resend.verification');
+
+// Google login routes
+Route::get('/auth/google',[UsersController::class, 'redirectToGoogle'])->name('login_with_google');
+Route::get('/auth/google/callback',[UsersController::class, 'handleGoogleCallback']);
+
+// Password reset routes
+Route::get('password/forgot', [UsersController::class, 'showForgotPasswordForm'])->name('password.request');
+Route::post('password/email', [UsersController::class, 'sendResetPassword'])->name('password.email');
+Route::get('/password/change', [UsersController::class, 'showChangePasswordForm'])->name('password.change');
+Route::post('/password/change', [UsersController::class, 'updatePassword'])->name('password.update');
 
 Route::middleware(['auth'])->group(function () {
     // Users routes
@@ -83,16 +98,19 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/checkout', [ProductsController::class, 'placeOrder'])->name('checkout.placeOrder');
     Route::get('/orders', [ProductsController::class, 'viewOrders'])->name('orders.view');
 
+    // Order return request
+    Route::post('/order/request-return/{orderItem}', [ProductsController::class, 'requestReturn'])->name('order.requestReturn');
+    // Order cancel
+    Route::post('/order/cancel/{order}', [ProductsController::class, 'cancelOrder'])->name('order.cancel');
+
     // Seller routes
     Route::get('/seller/dashboard', [SellerController::class, 'dashboard'])->name('seller.dashboard');
     Route::match(['get', 'post', 'put', 'delete'], '/seller/manage', [SellerController::class, 'manage'])->name('seller.manage');
-
 
     // Employee management routes (NO role middleware)
     Route::get('/employee/manage-seller', [EmployeeController::class, 'manageSellers'])->name('employee.manage_seller');
     Route::post('/employee/seller/{id}/activate', [EmployeeController::class, 'activateSeller'])->name('employee.sellers.activate');
     Route::post('/employee/seller/{id}/deactivate', [EmployeeController::class, 'deactivateSeller'])->name('employee.sellers.deactivate');
-
     Route::get('/employee/manage-orders', [EmployeeController::class, 'manageOrders'])->name('employee.manage_orders');
     Route::post('/employee/orders/{id}/accept', [EmployeeController::class, 'acceptOrder'])->name('employee.orders.accept');
     Route::post('/employee/orders/{id}/cancel', [EmployeeController::class, 'cancelOrder'])->name('employee.orders.cancel');
@@ -101,11 +119,17 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/employee/products/{id}/approve', [EmployeeController::class, 'approveProduct'])->name('employee.products.approve');
     Route::post('/employee/products/{id}/deny', [EmployeeController::class, 'denyProduct'])->name('employee.products.deny');
 
+    // Put product on hold
+    Route::post('/employee/product/{id}/hold', [EmployeeController::class, 'holdProduct'])->name('employee.products.hold');
+    // Delete product (only if on hold)
+    Route::delete('/employee/product/{id}/delete', [EmployeeController::class, 'deleteProduct'])->name('employee.products.delete');
+    // Resume (approve) product from hold
+    Route::post('/employee/products/{id}/resume', [EmployeeController::class, 'resumeProduct'])->name('employee.products.resume');
+
     // Manager routes
     Route::get('/manager/dashboard', [UsersController::class, 'dashboard'])->name('manager.dashboard');
 
     // Admin routes
-
     Route::get('/admin/roles-permissions', [SpatieController::class, 'manage'])->name('spatie.manage');
     Route::post('/admin/roles/add', [SpatieController::class, 'addRole'])->name('spatie.addrole');
     Route::post('/admin/roles/edit', [SpatieController::class, 'editRole'])->name('spatie.editrole');
@@ -115,5 +139,9 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/admin/assign-role', [SpatieController::class, 'assignRole'])->name('spatie.assignrole');
     Route::post('/admin/roles/delete', [SpatieController::class, 'deleteRole'])->name('spatie.deleterole');
     Route::post('/admin/permissions/delete', [SpatieController::class, 'deletePermission'])->name('spatie.deletepermission');
+
+    // Employee: Approve/Deny return requests
+    Route::post('/order/approve-return/{orderItem}', [ProductsController::class, 'approveReturnRequest'])->name('order.approveReturn');
+    Route::post('/order/deny-return/{orderItem}', [ProductsController::class, 'denyReturnRequest'])->name('order.denyReturn');
 
 });

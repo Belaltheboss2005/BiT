@@ -60,5 +60,54 @@
             @endif
         </div>
     </div>
+
+    <div class="card shadow mt-4">
+        <div class="card-header bg-warning text-dark">
+            <h4 class="mb-0">Return Requests</h4>
+        </div>
+        <div class="card-body">
+            @if(isset($returnRequests) && count($returnRequests) > 0)
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>User</th>
+                                <th>Product</th>
+                                <th>Quantity</th>
+                                <th>Reason/Description</th>
+                                <th>Requested At</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($returnRequests as $req)
+                                <tr>
+                                    <td>{{ $req['order']->id }}</td>
+                                    <td>{{ $req['order']->user->name ?? 'N/A' }}</td>
+                                    <td>{{ $req['item']->product_name }}</td>
+                                    <td>{{ $req['item']->quantity }}</td>
+                                    <td>{{ $req['item']->description ?? '-' }}</td>
+                                    <td>{{ $req['item']->updated_at ? $req['item']->updated_at->format('Y-m-d H:i') : '-' }}</td>
+                                    <td>
+                                        <form method="POST" action="{{ route('order.approveReturn', $req['item']->id) }}" style="display:inline-block;">
+                                            @csrf
+                                            <button type="submit" class="btn btn-success btn-sm">Approve</button>
+                                        </form>
+                                        <form method="POST" action="{{ route('order.denyReturn', $req['item']->id) }}" style="display:inline-block;">
+                                            @csrf
+                                            <button type="submit" class="btn btn-danger btn-sm">Deny</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @else
+                <div class="alert alert-info text-center">No return requests to manage.</div>
+            @endif
+        </div>
+    </div>
 </div>
 @endsection

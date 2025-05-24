@@ -21,9 +21,14 @@ class Order extends Model
     public $timestamps = true;
 
     public function user()
-{
-    return $this->belongsTo(User::class, 'user_id');
-}
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function ordered_items()
+    {
+        return $this->hasMany(\App\Models\OrderItem::class, 'order_id', 'id');
+    }
 }
 
 

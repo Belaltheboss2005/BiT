@@ -26,7 +26,7 @@ class User extends Authenticatable
         'email',
         'password',
         'credit',
-        
+        'force_change_password', // add this field for forced password change
     ];
 
     /**
@@ -49,6 +49,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'force_change_password' => 'boolean',
         ];
     }
 

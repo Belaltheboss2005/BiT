@@ -1,13 +1,12 @@
 @extends('layouts.master')
-
-@section('title', 'Login')
+@section('title', 'Forgot Password')
 @section('content')
 <div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-md-6">
             <div class="card shadow-lg border-0">
                 <div class="card-body bg-light">
-                    <h2 class="mb-4 text-center" style="color:#ff5722; font-weight:bold;">Login</h2>
+                    <h2 class="mb-4 text-center" style="color:#ff5722; font-weight:bold;">Forgot Password</h2>
                     @if(session('success'))
                         <div class="alert alert-success alert-dismissible fade show" role="alert">
                             {{ session('success') }}
@@ -23,25 +22,13 @@
                             </ul>
                         </div>
                     @endif
-                    <form method="POST" action="{{ route('login') }}">
+                    <form method="POST" action="{{ route('password.email') }}">
                         @csrf
                         <div class="mb-3">
                             <label for="email" class="form-label">Email address</label>
                             <input type="email" class="form-control" id="email" name="email" required autofocus>
                         </div>
-                        <div class="mb-3 d-flex justify-content-between align-items-center">
-                            <label for="password" class="form-label">Password</label>
-                        </div>
-                        <div class="mb-3">
-                            <input type="password" class="form-control" id="password" name="password" required>
-                        </div>
-                        <div class="mb-3">
-                            <a href="{{ route('password.request') }}" class="small" style="color:#007bff;">Forgot Password?</a>
-                        </div>
-                        <button type="submit" class="btn btn-primary w-100 mb-2">Login</button>
-                        <a href="{{ route('login_with_google') }}" class="btn btn-danger w-100" style="background:#db4437; border:none; font-weight:bold;">
-                            <i class="bi bi-google"></i> Login with Google
-                        </a>
+                        <button type="submit" class="btn btn-primary w-100">Send New Password</button>
                     </form>
                 </div>
             </div>
