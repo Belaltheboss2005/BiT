@@ -34,4 +34,14 @@ class Product extends Model
     {
         return $this->belongsTo(User::class, 'seller_id');
     }
+    
+    public function cartItems()
+    {
+        return $this->hasMany(CartItem::class);
+    }
+
+    public function orderItems()
+    {
+        return $this->hasMany(OrderItem::class);
+    }
 }
