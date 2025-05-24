@@ -14,6 +14,9 @@ class ProductsController extends Controller
 {
     public function index()
     {
+        if (!Auth::user() || !Auth::user()->can('products_for_customers')) {
+            abort(403, 'Unauthorized access');
+        }
         $products = Product::all();
         return view('product.product_list', compact('products'));
     }
@@ -110,7 +113,14 @@ class ProductsController extends Controller
         $cartItems = $cart ? CartItem::with('product')
             ->where('cart_id', $cart->id)
             ->get() : collect();
-        return view('product.checkout', compact('cartItems'));
+        // Calculate subtotal and totalQty
+        $subtotal = 0;
+        $totalQty = 0;
+        foreach ($cartItems as $item) {
+            $subtotal += $item->product->price * $item->quantity;
+            $totalQty += $item->quantity;
+        }
+        return view('product.checkout', compact('cartItems', 'subtotal', 'totalQty'));
     }
 
     public function placeOrder(Request $request)
@@ -151,6 +161,13 @@ class ProductsController extends Controller
             $orderItem->quantity = $item->quantity;
             $orderItem->price = $item->product->price;
             $orderItem->save();
+
+            // Decrease product stock
+            $product = $item->product;
+            if ($product && $product->stock >= $item->quantity) {
+                $product->stock -= $item->quantity;
+                $product->save();
+            }
         }
 
         CartItem::where('cart_id', $cart->id)->delete();

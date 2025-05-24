@@ -19,6 +19,14 @@ class Order extends Model
         'updated_at',
     ];
     public $timestamps = true;
+
+    public function user()
+{
+    return $this->belongsTo(User::class, 'user_id');
 }
+}
+
+
+
 
 

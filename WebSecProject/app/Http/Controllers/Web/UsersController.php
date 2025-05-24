@@ -21,6 +21,8 @@ use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\Product;
 use App\Models\Order;
+use App\Models\OrderItem;
+
 use App\Http\Controllers\Controller;
 
 
@@ -33,54 +35,42 @@ class UsersController extends Controller
     public function login(Request $request) {
         return view('users.login');
     }
+//     public function doLogin(Request $request)
+// {
+//     $credentials = $request->only('email', 'password');
+
+//     if (Auth::attempt($credentials)) {
+//         $request->session()->regenerate();
+//         return redirect()->intended('/');
+//     }
+
+//     return back()->withErrors([
+//         'email' => 'The provided credentials do not match our records.',
+//     ]);
+// }
+
     public function doLogin(Request $request)
-{
-    $credentials = $request->only('email', 'password');
+    {
+        $user = User::where('email', $request->email)->first();
 
-    if (Auth::attempt($credentials)) {
-        $request->session()->regenerate();
-
-        $user = Auth::user();
-        if ($user->hasRole('Seller')) {
-            return redirect()->intended('/seller/manage');
-        } elseif ($user->hasRole('Admin')) {
-            return redirect()->intended('/users');
-        } else {
-            // افتراضيًا، لو Customer أو أي دور تاني
-            return redirect()->intended('/products');
+        if ($user->hasRole('Banned')) {
+            return redirect()->route('banned_page');
         }
+
+        // if (!$user || !$user->email_verified_at) {
+        //     return redirect()->back()->withInput($request->input())
+        //         ->withErrors('Your email is not verified.');
+        // }
+
+        if (!Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
+            return redirect()->back()->withInput($request->input())
+                ->withErrors('Invalid login information.');
+        }
+
+        Auth::setUser($user);
+
+        return redirect('/')->with('success', 'Login successful!');
     }
-
-    return back()->withErrors([
-        'email' => 'The provided credentials do not match our records.',
-    ]);
-}
-
-    // public function doLogin(Request $request)
-    // {
-    //     $user = User::where('email', $request->email)->first();
-
-    //     if ($user->hasRole('Banned')) {
-    //         return redirect()->route('banned_page');
-    //     }
-
-    //     // if (!$user || !$user->email_verified_at) {
-    //     //     return redirect()->back()->withInput($request->input())
-    //     //         ->withErrors('Your email is not verified.');
-    //     // }
-
-    //     if (!Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
-    //         return redirect()->back()->withInput($request->input())
-    //             ->withErrors('Invalid login information.');
-    //     }
-
-    //     Auth::setUser($user);
-
-    //     return redirect('/')->with('success', 'Login successful!');
-    // }
-
-
-
 
     public function register(Request $request) {
         return view('users.register');
@@ -129,8 +119,6 @@ class UsersController extends Controller
         return redirect()->route('login')->with('success', 'Registration successful!');
     }
 
-
-
     // public function index()
     // {
     //     if (!Auth::user()->hasPermissionTo('show-users')) {
@@ -145,7 +133,9 @@ class UsersController extends Controller
         abort(403, 'Unauthorized');
     }
 
-    $query = User::with('roles');
+    $query = User::with('roles')->whereDoesntHave('roles', function($q) {
+        $q->where('name', 'admin');
+    });
 
     // Search functionality
     if ($request->has('keywords') && !empty($request->keywords)) {
@@ -164,10 +154,10 @@ class UsersController extends Controller
     if ($action === 'edit' && $request->has('user_id')) {
         $userToEdit = User::with('roles')->findOrFail($request->input('user_id'));
     } elseif ($action === 'add') {
-        return view('users.list', compact('users', 'action')); // Show add form
+        return view('manager.list', compact('users', 'action')); // Show add form
     }
 
-    return view('users.list', compact('users', 'action', 'userToEdit'));
+    return view('manager.list', compact('users', 'action', 'userToEdit'));
 }
 
     public function store(Request $request)
@@ -179,6 +169,7 @@ class UsersController extends Controller
             'name' => ['required', 'string', 'min:5'],
             'email' => ['required', 'email', 'unique:users'],
             'password' => ['required', 'confirmed', Password::min(5)->numbers()->letters()->mixedCase()->symbols()],
+            'role' => ['required', 'in:manager,seller,employee,customer'],
         ]);
 
         $user = User::create([
@@ -188,7 +179,7 @@ class UsersController extends Controller
             'credit' => 80000,
         ]);
 
-        $user->assignRole('customer');
+        $user->assignRole($request->role);
 
         return redirect()->route('users.manage')->with('success', 'User created!');
     }
@@ -202,9 +193,17 @@ class UsersController extends Controller
         $request->validate([
             'name' => ['required', 'string', 'min:5'],
             'email' => ['required', 'email', 'unique:users,email,' . $user->id],
+            'role' => ['required', 'in:manager,seller,employee,customer'],
+            'password' => ['nullable', 'confirmed', Password::min(5)->numbers()->letters()->mixedCase()->symbols()],
         ]);
 
-        $user->update($request->only(['name', 'email']));
+        $user->name = $request->name;
+        $user->email = $request->email;
+        if ($request->filled('password')) {
+            $user->password = bcrypt($request->password);
+        }
+        $user->save();
+        $user->syncRoles([$request->role]);
         return redirect()->route('users.manage')->with('success', 'User updated!');
     }
     public function destroy(User $user)
@@ -215,8 +214,6 @@ class UsersController extends Controller
         $user->delete();
         return redirect()->route('users.manage')->with('success', 'User deleted!');
     }
-
-
 
     public function profile(Request $request, User $user = null) {
 
@@ -244,15 +241,20 @@ class UsersController extends Controller
         return redirect('/');
 
     }
-
-
-
-
-
-
-
+    public function welcomePage()
+    {
+        return view('welcome');
+    }
+    public function dashboard()
+    {
+        // Only allow managers
+        // if (!Auth::user() || !Auth::user()->hasRole('manager')) {
+        //     abort(403, 'Unauthorized');
+        // }
+        $totalSales = Order::where('status', '!=', 'cancelled')->sum('total_amount');
+        $totalOrders = Order::count();
+        $totalProductsSold = OrderItem::sum('quantity');
+        $recentOrders = Order::with('user')->orderByDesc('created_at')->limit(10)->get();
+        return view('manager.dashboard', compact('totalSales', 'totalOrders', 'totalProductsSold', 'recentOrders'));
+    }
 }
-
-
-
-

@@ -32,7 +32,7 @@
                     <div class="col-7">
                         <div class="fw-bold fs-5 mb-1">{{ $item->product->name }}</div>
                         <div class="text-primary">{{ $item->product->stock }} left in stock</div>
-                        <div class="mb-1 small">sold by: <span class="text-primary">{{ $item->product->seller }}</span></div>
+                        <div class="mb-1 small">sold by: <span class="text-primary">{{ $item->product->seller ? $item->product->seller->name : 'Unknown' }}</span></div>
                         <div class="mb-1 small"><b>Model:</b> {{ $item->product->model }}</div>
                         <div class="d-flex align-items-center mt-2">
                             <form method="POST" action="{{ route('cart.updateQuantity', $item->id) }}" class="d-flex align-items-center gap-2">

@@ -33,6 +33,22 @@
             <input type="number" step="0.01" name="price" class="form-control" id="productPrice" required>
         </div>
         <div class="form-group">
+            <label>Stock</label>
+            <input type="text" name="stock" class="form-control" id="productStock" required>
+        </div>
+        <div class="form-group">
+            <label>Code</label>
+            <input type="text" name="code" class="form-control" id="productCode" required>
+        </div>
+        <div class="form-group">
+            <label>Model</label>
+            <input type="text" name="model" class="form-control" id="productModel" required>
+        </div>
+        <div class="form-group">
+            <label>Image</label>
+            <input type="text" name="image" class="form-control" id="productImage" required>
+        </div>
+        <div class="form-group">
             <label>Description</label>
             <textarea name="description" class="form-control" id="productDescription"></textarea>
         </div>
@@ -45,8 +61,13 @@
         <thead>
             <tr>
                 <th>ID</th>
+                <th>Image</th>
                 <th>Name</th>
                 <th>Price</th>
+                <th>Stock</th>
+                <th>Code</th>
+                <th>Model</th>
+                <th>Description</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -54,13 +75,28 @@
             @forelse ($products as $product)
                 <tr>
                     <td>{{ $product->id }}</td>
+                    <td>
+                        @if($product->image)
+                            <img src="{{ $product->image }}" alt="Image" style="max-width:60px; max-height:60px;">
+                        @else
+                            <span class="text-muted">No image</span>
+                        @endif
+                    </td>
                     <td>{{ $product->name }}</td>
                     <td>{{ $product->price }}</td>
+                    <td>{{ $product->stock }}</td>
+                    <td>{{ $product->code }}</td>
+                    <td>{{ $product->model }}</td>
+                    <td>{{ $product->description }}</td>
                     <td>
-                        <button class="btn btn-warning btn-sm edit-btn" 
-                                data-id="{{ $product->id }}" 
-                                data-name="{{ $product->name }}" 
-                                data-price="{{ $product->price }}" 
+                        <button class="btn btn-warning btn-sm edit-btn"
+                                data-id="{{ $product->id }}"
+                                data-image="{{ $product->image }}"
+                                data-name="{{ $product->name }}"
+                                data-price="{{ $product->price }}"
+                                data-stock="{{ $product->stock }}"
+                                data-code="{{ $product->code }}"
+                                data-model="{{ $product->model }}"
                                 data-description="{{ $product->description ?? '' }}">Edit</button>
                         <form action="{{ route('seller.manage') }}" method="POST" style="display:inline;" class="delete-form">
                             @csrf
@@ -72,7 +108,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="4">No products found.</td>
+                    <td colspan="9">No products found.</td>
                 </tr>
             @endforelse
         </tbody>
@@ -94,6 +130,10 @@
                 productId.value = this.getAttribute('data-id');
                 productName.value = this.getAttribute('data-name');
                 productPrice.value = this.getAttribute('data-price');
+                productStock.value = this.getAttribute('data-stock');
+                productCode.value = this.getAttribute('data-code');
+                productModel.value = this.getAttribute('data-model');
+                productImage.value = this.getAttribute('data-image');
                 productDescription.value = this.getAttribute('data-description');
                 submitBtn.textContent = 'Update Product';
                 cancelBtn.style.display = 'inline';

@@ -3,7 +3,7 @@
 // use Illuminate\Support\Facades\Route;
 // use App\Http\Controllers\Web\ProductsController; // Consistent capitalization
 // use App\Http\Controllers\Web\UsersController;
-// use App\Http\Controllers\Web\SellerController; 
+// use App\Http\Controllers\Web\SellerController;
 
 
 // Route::get('/', function () {
@@ -54,10 +54,10 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Web\ProductsController;
 use App\Http\Controllers\Web\UsersController;
 use App\Http\Controllers\Web\SellerController;
+use App\Http\Controllers\Web\EmployeeController;
+use App\Http\Controllers\Web\SpatieController;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', [UsersController::class, 'welcomePage'])->name('welcome');
 
 Route::get('register', [UsersController::class, 'register'])->name('register');
 Route::post('do_Register', [UsersController::class, 'doRegister'])->name('do_register');
@@ -84,5 +84,36 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/orders', [ProductsController::class, 'viewOrders'])->name('orders.view');
 
     // Seller routes
+    Route::get('/seller/dashboard', [SellerController::class, 'dashboard'])->name('seller.dashboard');
     Route::match(['get', 'post', 'put', 'delete'], '/seller/manage', [SellerController::class, 'manage'])->name('seller.manage');
+
+
+    // Employee management routes (NO role middleware)
+    Route::get('/employee/manage-seller', [EmployeeController::class, 'manageSellers'])->name('employee.manage_seller');
+    Route::post('/employee/seller/{id}/activate', [EmployeeController::class, 'activateSeller'])->name('employee.sellers.activate');
+    Route::post('/employee/seller/{id}/deactivate', [EmployeeController::class, 'deactivateSeller'])->name('employee.sellers.deactivate');
+
+    Route::get('/employee/manage-orders', [EmployeeController::class, 'manageOrders'])->name('employee.manage_orders');
+    Route::post('/employee/orders/{id}/accept', [EmployeeController::class, 'acceptOrder'])->name('employee.orders.accept');
+    Route::post('/employee/orders/{id}/cancel', [EmployeeController::class, 'cancelOrder'])->name('employee.orders.cancel');
+
+    // Product approval routes
+    Route::post('/employee/products/{id}/approve', [EmployeeController::class, 'approveProduct'])->name('employee.products.approve');
+    Route::post('/employee/products/{id}/deny', [EmployeeController::class, 'denyProduct'])->name('employee.products.deny');
+
+    // Manager routes
+    Route::get('/manager/dashboard', [UsersController::class, 'dashboard'])->name('manager.dashboard');
+
+    // Admin routes
+
+    Route::get('/admin/roles-permissions', [SpatieController::class, 'manage'])->name('spatie.manage');
+    Route::post('/admin/roles/add', [SpatieController::class, 'addRole'])->name('spatie.addrole');
+    Route::post('/admin/roles/edit', [SpatieController::class, 'editRole'])->name('spatie.editrole');
+    Route::post('/admin/permissions/add', [SpatieController::class, 'addPermission'])->name('spatie.addpermission');
+    Route::post('/admin/permissions/edit', [SpatieController::class, 'editPermission'])->name('spatie.editpermission');
+    Route::post('/admin/assign-permission', [SpatieController::class, 'assignPermission'])->name('spatie.assignpermission');
+    Route::post('/admin/assign-role', [SpatieController::class, 'assignRole'])->name('spatie.assignrole');
+    Route::post('/admin/roles/delete', [SpatieController::class, 'deleteRole'])->name('spatie.deleterole');
+    Route::post('/admin/permissions/delete', [SpatieController::class, 'deletePermission'])->name('spatie.deletepermission');
+
 });
