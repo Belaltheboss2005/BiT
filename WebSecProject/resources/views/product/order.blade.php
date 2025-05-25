@@ -42,6 +42,8 @@
                                             Your refund has been issued.
                                         @elseif($order->status === 'completed')
                                             Your order has been delivered.
+                                        @elseif($order->status === 'accepted' || $order->status === 'approved')
+                                            Your order has been accepted.
                                         @else
                                             Status update available soon.
                                         @endif
@@ -61,6 +63,22 @@
                                                     <div class="text-muted small">Quantity: x{{ $item->quantity }}</div>
                                                     @if(!empty($item->description))
                                                         <div class="small text-secondary mt-1">{{ $item->description }}</div>
+                                                    @endif
+                                                    {{-- Return button logic --}}
+                                                    @if(in_array($order->status, ['accepted', 'approved']) && $item->status !== 'pending return request')
+                                                        <form action="{{ route('order.requestReturn', ['orderItem' => $item->id]) }}" method="POST" class="mt-2">
+                                                            @csrf
+                                                            <button type="submit" class="btn btn-warning btn-sm">Request Return</button>
+                                                        </form>
+                                                    @elseif($item->status === 'pending return request')
+                                                        <span class="badge bg-warning text-dark mt-2">Return Requested</span>
+                                                    @endif
+                                                    {{-- Cancel button logic --}}
+                                                    @if($order->status === 'pending')
+                                                        <form action="{{ route('order.cancel', ['order' => $order->id]) }}" method="POST" class="mt-2">
+                                                            @csrf
+                                                            <button type="submit" class="btn btn-danger btn-sm">Cancel Order</button>
+                                                        </form>
                                                     @endif
                                                 </div>
                                             </div>

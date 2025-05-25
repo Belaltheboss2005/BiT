@@ -33,15 +33,25 @@ class Product extends Model
     public function seller()
     {
         return $this->belongsTo(User::class, 'seller_id');
-    }
+     }
+// <<<<<<< HEAD
     
-    public function cartItems()
-    {
-        return $this->hasMany(CartItem::class);
-    }
+//     public function cartItems()
+//     {
+//         return $this->hasMany(CartItem::class);
+//     }
 
-    public function orderItems()
-    {
-        return $this->hasMany(OrderItem::class);
+//     public function orderItems()
+//     {
+//         return $this->hasMany(OrderItem::class);
+//     }
+// }
+// =======
+
+//     public function orderItems()
+//     {
+//         return $this->hasMany(\App\Models\OrderItem::class, 'product_id', 'id');
+//     }
+// }
+// >>>>>>> c852b8fff83275450059bb2eb3aa357423d9959
     }
-}

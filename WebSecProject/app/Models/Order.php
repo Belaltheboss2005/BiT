@@ -18,18 +18,28 @@ class Order extends Model
         'created_at',
         'updated_at',
     ];
-    public $timestamps = true;
+    public $timestamps = true;}
 
-    public function user()
-{
-    return $this->belongsTo(User::class, 'user_id');
-}
+//     public function user()
+// <<<<<<< HEAD
+// {
+//     return $this->belongsTo(User::class, 'user_id');
+// }
 
-public function orderItems()
-    {
-        return $this->hasMany(OrderItem::class);
-    }
-}
+// public function orderItems()
+//     {
+//         return $this->hasMany(OrderItem::class);
+// =======
+//     {
+//         return $this->belongsTo(User::class, 'user_id');
+//     }
+
+//     public function ordered_items()
+//     {
+//         return $this->hasMany(\App\Models\OrderItem::class, 'order_id', 'id');
+// >>>>>>> c852b8fff83275450059bb2eb3aa357423d99592
+//     }
+// }
 
 
 

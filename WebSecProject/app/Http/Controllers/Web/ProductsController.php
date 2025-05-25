@@ -187,4 +187,83 @@ class ProductsController extends Controller
         }
         return view('product.order', compact('orders'));
     }
+
+    public function requestReturn($orderItemId)
+    {
+        if (!Auth::user() || !Auth::user()->can('products_for_customers')) {
+            abort(403, 'Unauthorized access');
+        }
+        $orderItem = OrderItem::findOrFail($orderItemId);
+        $order = $orderItem->order;
+        if (auth()->id() !== $order->user_id) {
+            abort(403, 'Unauthorized');
+        }
+        if (!in_array($order->status, ['accepted', 'approved'])) {
+            return back()->with('error', 'Return not allowed for this order status.');
+        }
+        if ($orderItem->status === 'pending return request') {
+            return back()->with('info', 'Return already requested.');
+        }
+        $orderItem->status = 'pending return request';
+        $orderItem->save();
+        return back()->with('success', 'Return request submitted.');
+    }
+
+    public function cancelOrder($orderId)
+    {
+        if (!Auth::user() || !Auth::user()->can('products_for_customers')) {
+            abort(403, 'Unauthorized access');
+        }
+        $order = Order::findOrFail($orderId);
+        if (auth()->id() !== $order->user_id) {
+            abort(403, 'Unauthorized');
+        }
+        if ($order->status !== 'pending') {
+            return back()->with('error', 'Order cannot be cancelled.');
+        }
+        $order->status = 'cancelled';
+        $order->save();
+        return back()->with('success', 'Order cancelled successfully.');
+    }
+
+    public function approveReturnRequest($orderItemId)
+    {
+
+
+        $orderItem = OrderItem::findOrFail($orderItemId);
+        $order = $orderItem->order;
+        // Only employees can approve/deny
+        if (!auth()->user() || !auth()->user()->hasPermissionTo('edit_return_requests')) {
+            abort(403, 'Unauthorized');
+        }
+        if ($orderItem->status !== 'pending return request') {
+            return back()->with('error', 'No pending return request for this item.');
+        }
+        $orderItem->status = 'returned';
+        $orderItem->save();
+        // Optionally, update order status if all items are returned
+        $allReturned = $order->ordered_items->every(function($item) {
+            return $item->status === 'returned';
+        });
+        if ($allReturned) {
+            $order->status = 'refunded';
+            $order->save();
+        }
+        return back()->with('success', 'Return request approved.');
+    }
+
+    public function denyReturnRequest($orderItemId)
+    {
+        $orderItem = OrderItem::findOrFail($orderItemId);
+        // Only employees can approve/deny
+        if (!auth()->user() || !auth()->user()->hasPermissionTo('edit_return_requests')) {
+            abort(403, 'Unauthorized');
+        }
+        if ($orderItem->status !== 'pending return request') {
+            return back()->with('error', 'No pending return request for this item.');
+        }
+        $orderItem->status = 'return denied';
+        $orderItem->save();
+        return back()->with('success', 'Return request denied.');
+    }
 }

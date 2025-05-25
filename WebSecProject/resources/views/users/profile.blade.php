@@ -35,27 +35,19 @@
                 </td>
             </tr>
         </table>
-
-        {{-- <div class="row">
-            @if(!$user->hasVerifiedEmail())
-                <div class="col col-5">
+        <div class="row">
+            @if(!$user->email_verified_at)
+                <div class="col col-6 mb-2">
                     <form method="POST" action="{{ route('resend.verification') }}">
                         @csrf
-                        <button type="submit" class="btn btn-warning">Resend Verification Email</button>
+                        <button type="submit" class="btn btn-warning w-100">Send Verification Email</button>
                     </form>
                 </div>
             @endif
-            @if(auth()->user()->hasPermissionTo('admin_users')||auth()->id()==$user->id)
-                <div class="col col-4">
-                    <a class="btn btn-primary" href='{{route('edit_password', $user->id)}}'>Change Password</a>
-                </div>
-            @endif
-            @if(auth()->user()->hasPermissionTo('edit_users')||auth()->id()==$user->id)
-                <div class="col col-3">
-                    <a href="{{route('users_edit', $user->id)}}" class="btn btn-success form-control">Edit</a>
-                </div>
-            @endif
-        </div> --}}
+            <div class="col col-6 mb-2">
+                <a class="btn btn-primary w-100" href="{{ route('password.change') }}">Change Password</a>
+            </div>
+        </div>
     </div>
 </div>
 @endsection

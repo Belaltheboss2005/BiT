@@ -84,6 +84,18 @@ class SellerController extends Controller
             }
         }
 
-        return view('seller.manage', compact('products')); // غيّرنا هنا
+        return view('seller.manage', compact('products'));
+    }
+
+    public function dashboard(Request $request)
+    {
+        $sellerId = Auth::id();
+        $products = Product::where('seller_id', $sellerId)->get();
+        // Calculate sales count for each product
+        $salesCounts = [];
+        foreach ($products as $product) {
+            $salesCounts[$product->id] = $product->orderItems()->sum('quantity');
+        }
+        return view('seller.seller_dashboard', compact('products', 'salesCounts'));
     }
 }

@@ -22,6 +22,7 @@ use App\Models\CartItem;
 use App\Models\Product;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Mail\ResetPasswordMail;
 
 use App\Http\Controllers\Controller;
 
@@ -35,32 +36,15 @@ class UsersController extends Controller
     public function login(Request $request) {
         return view('users.login');
     }
-//     public function doLogin(Request $request)
-// {
-//     $credentials = $request->only('email', 'password');
 
-//     if (Auth::attempt($credentials)) {
-//         $request->session()->regenerate();
-//         return redirect()->intended('/');
-//     }
-
-//     return back()->withErrors([
-//         'email' => 'The provided credentials do not match our records.',
-//     ]);
-// }
 
     public function doLogin(Request $request)
     {
         $user = User::where('email', $request->email)->first();
 
-        if ($user->hasRole('Banned')) {
+        if ($user && $user->hasRole('Banned')) {
             return redirect()->route('banned_page');
         }
-
-        // if (!$user || !$user->email_verified_at) {
-        //     return redirect()->back()->withInput($request->input())
-        //         ->withErrors('Your email is not verified.');
-        // }
 
         if (!Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
             return redirect()->back()->withInput($request->input())
@@ -69,9 +53,77 @@ class UsersController extends Controller
 
         Auth::setUser($user);
 
+        // Check if user must change password after reset
+        if ($user->force_change_password) {
+            return redirect()->route('password.change')->with('info', 'You must change your password before continuing.');
+        }
+
         return redirect('/')->with('success', 'Login successful!');
     }
 
+    public function redirectToGoogle()
+    {
+    return Socialite::driver('google')->redirect();
+    }
+
+
+    public function handleGoogleCallback()
+    {
+        try {
+            // Retrieve the Google user data
+            $googleUser = Socialite::driver('google')->stateless()->user();
+
+            // Log the Google user data for debugging
+            Log::info('Google User:', [
+                'id' => $googleUser->id,
+                'name' => $googleUser->name,
+                'email' => $googleUser->email,
+                'token' => $googleUser->token,
+                'refresh_token' => $googleUser->refreshToken,
+            ]);
+
+            // Check if the user already exists by email
+            $user = User::where('email', $googleUser->email)->first();
+
+            // If the user exists, update their Google data
+            if ($user) {
+                $user->google_id = $googleUser->id;
+                $user->google_token = $googleUser->token;
+                $user->google_refresh_token = $googleUser->refreshToken;
+                $user->save();
+            } else {
+                // If the user doesn't exist, create a new one
+                $user = new User();
+                $user->name = $googleUser->name;
+                $user->email = $googleUser->email;
+                $user->google_id = $googleUser->id;
+                $user->google_token = $googleUser->token;
+                $user->google_refresh_token = $googleUser->refreshToken;
+                $user->password = bcrypt('default_password'); // Set a default password
+                $user->credit = 80000; // Assign 80000 credit to the user
+                $user->assignRole('customer');
+                $user->save();
+
+                // Send the verification email as in your doRegister method
+                $title = "Verification Link";
+                $token = Crypt::encryptString(json_encode(['id' => $user->id, 'email' => $user->email]));
+                $link = route("verify", ['token' => $token]);
+                Mail::to($user->email)->send(new VerificationEmail($link, $user->name));
+            }
+
+            // Log the user in
+            Auth::login($user);
+
+            // Redirect to the home page or dashboard
+            return redirect('/')->with('success', 'Logged in successfully with Google!');
+        } catch (\Exception $e) {
+            // Log the error for debugging
+            Log::error('Google Login Error:', ['message' => $e->getMessage()]);
+
+            // Redirect back to the login page with an error message
+            return redirect('/login')->with('error', 'Google login failed. Please try again.');
+        }
+    }
     public function register(Request $request) {
         return view('users.register');
     }
@@ -104,29 +156,29 @@ class UsersController extends Controller
         $user_id->save();
 
         // Check email verification preference
-        // if ($request->email_verification === 'now') {
-        //     $title = "Verification Link";
-        //     $token = Crypt::encryptString(json_encode(['id' => $user->id, 'email' => $user->email]));
-        //     $link = route("verify", ['token' => $token]);
-        //     try {
-        //         Mail::to($user->email)->send(new VerificationEmail($link, $user->name));
-        //         Log::info('Verification email sent successfully to ' . $user->email);
-        //     } catch (\Exception $e) {
-        //         Log::error('Failed to send verification email: ' . $e->getMessage());
-        //     }
-        // }
+        if ($request->email_verification === 'now') {
+            $title = "Verification Link";
+            $token = Crypt::encryptString(json_encode(['id' => $user->id, 'email' => $user->email]));
+            $link = route("verify", ['token' => $token]);
+            try {
+                Mail::to($user->email)->send(new VerificationEmail($link, $user->name));
+                Log::info('Verification email sent successfully to ' . $user->email);
+            } catch (\Exception $e) {
+                Log::error('Failed to send verification email: ' . $e->getMessage());
+            }
+        }
 
         return redirect()->route('login')->with('success', 'Registration successful!');
     }
 
-    // public function index()
-    // {
-    //     if (!Auth::user()->hasPermissionTo('show-users')) {
-    //         abort(403, 'Unauthorized');
-    //     }
-    //     $users = User::all();
-    //     return view('users.list', compact('users'));
-    // }
+    public function verify(Request $request) {
+        $decryptedData = json_decode(Crypt::decryptString($request->token), true);
+        $user = User::find($decryptedData['id']);
+        if(!$user) abort(401);
+        $user->email_verified_at = Carbon::now();
+        $user->save();
+        return redirect()->route('welcome')->with('success', 'Email verified successfully!');
+    }
     public function manageUsers(Request $request)
 {
     if (!Auth::user()->hasPermissionTo('show-users')) {
@@ -218,9 +270,9 @@ class UsersController extends Controller
     public function profile(Request $request, User $user = null) {
 
         $user = $user??auth()->user();
-        // if(auth()->id()!=$user->id) {
-        //     if(!auth()->user()->hasPermissionTo('show_users')) abort(401);
-        // }
+        if(auth()->id()!=$user->id) {
+            if(!auth()->user()->hasPermissionTo('show_users')) abort(401);
+        }
 
         $permissions = [];
         foreach($user->permissions as $permission) {
@@ -248,13 +300,66 @@ class UsersController extends Controller
     public function dashboard()
     {
         // Only allow managers
-        // if (!Auth::user() || !Auth::user()->hasRole('manager')) {
-        //     abort(403, 'Unauthorized');
-        // }
+        if (!Auth::user()->hasPermissionTo('manage-users')) {
+        abort(403, 'Unauthorized');
+    }
         $totalSales = Order::where('status', '!=', 'cancelled')->sum('total_amount');
         $totalOrders = Order::count();
         $totalProductsSold = OrderItem::sum('quantity');
         $recentOrders = Order::with('user')->orderByDesc('created_at')->limit(10)->get();
         return view('manager.dashboard', compact('totalSales', 'totalOrders', 'totalProductsSold', 'recentOrders'));
+    }
+    public function showForgotPasswordForm()
+    {
+        return view('users.forgot_password');
+    }
+
+    public function sendResetPassword(Request $request)
+    {
+        $request->validate(['email' => 'required|email|exists:users,email']);
+        $user = User::where('email', $request->email)->first();
+        $newPassword = bin2hex(random_bytes(4)); // 8-char random password
+        $user->password = bcrypt($newPassword);
+        $user->force_change_password = true;
+        $user->save();
+        try {
+            Mail::to($user->email)->send(new ResetPasswordMail($user->name, $newPassword));
+        } catch (\Exception $e) {
+            \Log::error('Failed to send reset password email: ' . $e->getMessage());
+            return back()->withErrors('Failed to send reset password email.');
+        }
+        return redirect()->route('login')->with('success', 'A new password has been sent to your email.');
+    }
+    public function showChangePasswordForm()
+    {
+        return view('users.change_password');
+    }
+
+    public function updatePassword(Request $request)
+    {
+        $request->validate([
+            'password' => ['required', 'confirmed', Password::min(5)->numbers()->letters()->mixedCase()->symbols()],
+        ]);
+        $user = Auth::user();
+        $user->password = bcrypt($request->password);
+        $user->force_change_password = false;
+        $user->save();
+        return redirect('/')->with('success', 'Password changed successfully!');
+    }
+    public function resendVerificationEmail(Request $request)
+    {
+        $user = Auth::user();
+        if ($user && !$user->email_verified_at) {
+            $token = \Crypt::encryptString(json_encode(['id' => $user->id, 'email' => $user->email]));
+            $link = route('verify', ['token' => $token]);
+            try {
+                \Mail::to($user->email)->send(new \App\Mail\VerificationEmail($link, $user->name));
+                return back()->with('success', 'Verification email sent successfully!');
+            } catch (\Exception $e) {
+                \Log::error('Failed to resend verification email: ' . $e->getMessage());
+                return back()->withErrors('Failed to send verification email.');
+            }
+        }
+        return back()->withErrors('Email is already verified or user not found.');
     }
 }
