@@ -75,6 +75,10 @@ Route::post('resend-verification', [UsersController::class, 'resendVerificationE
 Route::get('/auth/google',[UsersController::class, 'redirectToGoogle'])->name('login_with_google');
 Route::get('/auth/google/callback',[UsersController::class, 'handleGoogleCallback']);
 
+// Microsoft login routes
+Route::get('/auth/microsoft', [UsersController::class, 'redirectToMicrosoft'])->name('login_with_microsoft');
+Route::get('/auth/microsoft/callback', [UsersController::class, 'handleMicrosoftCallback']);
+
 // Password reset routes
 Route::get('password/forgot', [UsersController::class, 'showForgotPasswordForm'])->name('password.request');
 Route::post('password/email', [UsersController::class, 'sendResetPassword'])->name('password.email');

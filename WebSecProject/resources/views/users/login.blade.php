@@ -39,8 +39,11 @@
                             <a href="{{ route('password.request') }}" class="small" style="color:#007bff;">Forgot Password?</a>
                         </div>
                         <button type="submit" class="btn btn-primary w-100 mb-2">Login</button>
-                        <a href="{{ route('login_with_google') }}" class="btn btn-danger w-100" style="background:#db4437; border:none; font-weight:bold;">
+                        <a href="{{ route('login_with_google') }}" class="btn btn-success w-100" style="border:none; font-weight:bold;">
                             <i class="bi bi-google"></i> Login with Google
+                        </a>
+                        <a href="{{ route('login_with_microsoft') }}" class="btn btn-info w-100 mt-2" style="background:#2F2FEE; border:none; font-weight:bold; color:white;">
+                            <i class="bi bi-microsoft"></i> Login with Microsoft
                         </a>
                     </form>
                 </div>

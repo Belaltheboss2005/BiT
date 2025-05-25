@@ -14,7 +14,7 @@
         "laravel/passport": "^13.0",
         "laravel/socialite": "^5.20",
         "laravel/tinker": "^2.10.1",
-        "socialiteproviders/microsoft": "*",
+        "socialiteproviders/microsoft": "^4.6",
         "spatie/laravel-permission": "^6.18"
     },
     "require-dev": {

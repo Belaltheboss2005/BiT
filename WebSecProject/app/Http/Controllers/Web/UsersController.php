@@ -385,4 +385,50 @@ class UsersController extends Controller
         }
         return back()->withErrors('Email is already verified or user not found.');
     }
+
+        public function redirectToMicrosoft()
+    {
+    if (Auth::user()){
+        abort(403, 'Unauthorized access');
+    }
+    return Socialite::driver('microsoft')->redirect();
+    }
+
+    public function handleMicrosoftCallback()
+{
+    if (Auth::user()) {
+        abort(403, 'Unauthorized access');
+    }
+    try {
+        $microsoftUser = Socialite::driver('microsoft')->stateless()->user();
+        $user = User::where('email', $microsoftUser->email)->first();
+        if ($user) {
+            $user->microsoft_id = $microsoftUser->id;
+            $user->microsoft_token = $microsoftUser->token;
+            $user->microsoft_refresh_token = $microsoftUser->refreshToken;
+            $user->save();
+        } else {
+            $user = User::create([
+                'name' => $microsoftUser->name,
+                'email' => $microsoftUser->email,
+                'microsoft_id' => $microsoftUser->id,
+                'microsoft_token' => $microsoftUser->token,
+                'microsoft_refresh_token' => $microsoftUser->refreshToken,
+                'password' => bcrypt('default_password'),
+                'credit' => 80000,
+            ]);
+            $user->assignRole('customer');
+        }
+        Auth::login($user);
+        return redirect('/')->with('success', 'Logged in successfully with Microsoft!');
+    } catch (\Exception $e) {
+        Log::error('Microsoft Login Error:', ['message' => $e->getMessage()]);
+        return redirect('/login')->with('error', 'Microsoft login failed. Please try again.');
+    }
 }
+
+}
+
+
+
+

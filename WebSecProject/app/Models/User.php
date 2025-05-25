@@ -21,12 +21,19 @@ class User extends Authenticatable
      *
      * @var list<string>
      */
+
     protected $fillable = [
         'name',
         'email',
         'password',
         'credit',
-        'force_change_password', // add this field for forced password change
+        'force_change_password',
+        'google_id',
+        'google_token',
+        'google_refresh_token',
+        'microsoft_id',
+        'microsoft_token',
+        'microsoft_refresh_token',
     ];
 
     /**
