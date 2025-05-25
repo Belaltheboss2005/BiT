@@ -63,7 +63,8 @@ Route::get('/', [UsersController::class, 'welcomePage'])->name('welcome');
 Route::get('register', [UsersController::class, 'register'])->name('register');
 Route::post('do_Register', [UsersController::class, 'doRegister'])->name('do_register');
 Route::get('login', [UsersController::class, 'login'])->name('login');
-Route::post('web/login', [UsersController::class, 'doLogin'])->name('do_login');Route::get('logout', [UsersController::class, 'doLogout'])->name('do_logout');
+Route::post('login', [UsersController::class, 'doLogin'])->name('do_login');
+Route::get('logout', [UsersController::class, 'doLogout'])->name('do_logout');
 Route::get('profile/{user?}', [UsersController::class, 'profile'])->name('profile');
 
 // email verification route
@@ -82,7 +83,7 @@ Route::post('/password/change', [UsersController::class, 'updatePassword'])->nam
 
 Route::middleware(['auth'])->group(function () {
     // Users routes
-    Route::get('/users', [UsersController::class, 'manageUsers'])->name('users.manage');
+
     Route::post('/users/store', [UsersController::class, 'store'])->name('users.store');
     Route::post('/users/update', [UsersController::class, 'update'])->name('users.update');
     Route::delete('/users/{user}', [UsersController::class, 'destroy'])->name('users.destroy');
@@ -126,6 +127,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/employee/products/{id}/resume', [EmployeeController::class, 'resumeProduct'])->name('employee.products.resume');
 
     // Manager routes
+    Route::get('/users', [UsersController::class, 'manageUsers'])->name('users.manage');
     Route::get('/manager/dashboard', [UsersController::class, 'dashboard'])->name('manager.dashboard');
 
     // Admin routes

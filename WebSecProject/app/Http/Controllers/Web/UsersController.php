@@ -34,12 +34,18 @@ class UsersController extends Controller
 
 
     public function login(Request $request) {
+        if (Auth::user()){
+            abort(403, 'Unauthorized access');
+        }
         return view('users.login');
     }
 
 
     public function doLogin(Request $request)
     {
+        if (Auth::user()){
+            abort(403, 'Unauthorized access');
+        }
         $user = User::where('email', $request->email)->first();
 
         if ($user && $user->hasRole('Banned')) {
@@ -63,12 +69,18 @@ class UsersController extends Controller
 
     public function redirectToGoogle()
     {
+    if (Auth::user()){
+        abort(403, 'Unauthorized access');
+    }
     return Socialite::driver('google')->redirect();
     }
 
 
     public function handleGoogleCallback()
     {
+        if (Auth::user()){
+            abort(403, 'Unauthorized access');
+        }
         try {
             // Retrieve the Google user data
             $googleUser = Socialite::driver('google')->stateless()->user();
@@ -125,10 +137,16 @@ class UsersController extends Controller
         }
     }
     public function register(Request $request) {
+        if (Auth::user()){
+            abort(403, 'Unauthorized access');
+        }
         return view('users.register');
     }
 
     public function doRegister(Request $request) {
+        if (Auth::user()){
+            abort(403, 'Unauthorized access');
+        }
 
         try {
             $this->validate($request, [
@@ -184,7 +202,7 @@ class UsersController extends Controller
     if (!Auth::user()->hasPermissionTo('show-users')) {
         abort(403, 'Unauthorized');
     }
-
+    // Query to get all users except those with the 'admin' role
     $query = User::with('roles')->whereDoesntHave('roles', function($q) {
         $q->where('name', 'admin');
     });
@@ -271,7 +289,7 @@ class UsersController extends Controller
 
         $user = $user??auth()->user();
         if(auth()->id()!=$user->id) {
-            if(!auth()->user()->hasPermissionTo('show_users')) abort(401);
+            if(!auth()->user()->hasPermissionTo('show_users_profile')) abort(401);
         }
 
         $permissions = [];
@@ -348,15 +366,20 @@ class UsersController extends Controller
     }
     public function resendVerificationEmail(Request $request)
     {
+        // Only allow authenticated users who don't have their email verified
+        if (!Auth::check() || (Auth::user() && Auth::user()->email_verified_at)) {
+            return redirect()->route('login')->withErrors('You must be logged in or you have already verified your email.');
+        }
+
         $user = Auth::user();
         if ($user && !$user->email_verified_at) {
-            $token = \Crypt::encryptString(json_encode(['id' => $user->id, 'email' => $user->email]));
+            $token = Crypt::encryptString(json_encode(['id' => $user->id, 'email' => $user->email]));
             $link = route('verify', ['token' => $token]);
             try {
-                \Mail::to($user->email)->send(new \App\Mail\VerificationEmail($link, $user->name));
+                Mail::to($user->email)->send(new VerificationEmail($link, $user->name));
                 return back()->with('success', 'Verification email sent successfully!');
             } catch (\Exception $e) {
-                \Log::error('Failed to resend verification email: ' . $e->getMessage());
+                Log::error('Failed to resend verification email: ' . $e->getMessage());
                 return back()->withErrors('Failed to send verification email.');
             }
         }

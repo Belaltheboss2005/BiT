@@ -14,7 +14,7 @@ class SpatieController extends Controller
 {
     public function manage()
     {
-        if (!Auth::user() || !Auth::user()->can('spatie_manage')) {
+        if (!Auth::user() && !Auth::user()->can('spatie_manage')) {
             abort(403, 'Unauthorized access');
         }
         $roles = Role::all();
@@ -25,7 +25,7 @@ class SpatieController extends Controller
 
     public function addRole(Request $request)
     {
-        if (!Auth::user() || !Auth::user()->can('spatie_addRole')) {
+        if (!Auth::user() && !Auth::user()->can('spatie_addRole')) {
             abort(403, 'Unauthorized access');
         }
         try {
@@ -39,7 +39,7 @@ class SpatieController extends Controller
 
     public function editRole(Request $request)
     {
-        if (!Auth::user() || !Auth::user()->can('spatie_editRole')) {
+        if (!Auth::user() && !Auth::user()->can('spatie_editRole')) {
             abort(403, 'Unauthorized access');
         }
         try {
@@ -58,7 +58,7 @@ class SpatieController extends Controller
 
     public function addPermission(Request $request)
     {
-        if (!Auth::user() || !Auth::user()->can('spatie_addPermission')) {
+        if (!Auth::user() && !Auth::user()->can('spatie_addPermission')) {
             abort(403, 'Unauthorized access');
         }
         try {
@@ -72,7 +72,7 @@ class SpatieController extends Controller
 
     public function editPermission(Request $request)
     {
-        if (!Auth::user() || !Auth::user()->can('spatie_editPermission')) {
+        if (!Auth::user() && !Auth::user()->can('spatie_editPermission')) {
             abort(403, 'Unauthorized access');
         }
         try {
@@ -91,7 +91,7 @@ class SpatieController extends Controller
 
     public function assignPermission(Request $request)
     {
-        if (!Auth::user() || !Auth::user()->can('spatie_assignPermission')) {
+        if (!Auth::user() && !Auth::user()->can('spatie_assignPermission')) {
             abort(403, 'Unauthorized access');
         }
         try {
@@ -113,7 +113,7 @@ class SpatieController extends Controller
 
     public function assignRole(Request $request)
     {
-        if (!Auth::user() || !Auth::user()->can('spatie_assignRole')) {
+        if (!Auth::user() && !Auth::user()->can('spatie_assignRole')) {
             abort(403, 'Unauthorized access');
         }
         try {
@@ -135,7 +135,7 @@ class SpatieController extends Controller
 
     public function deleteRole(Request $request)
     {
-        if (!Auth::user() || !Auth::user()->can('spatie_deleteRole')) {
+        if (!Auth::user() && !Auth::user()->can('spatie_deleteRole')) {
             abort(403, 'Unauthorized access');
         }
         try {
@@ -155,7 +155,7 @@ class SpatieController extends Controller
 
     public function deletePermission(Request $request)
     {
-        if (!Auth::user() || !Auth::user()->can('spatie_deletePermission')) {
+        if (!Auth::user() && !Auth::user()->can('spatie_deletePermission')) {
             abort(403, 'Unauthorized access');
         }
         try {

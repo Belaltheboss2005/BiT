@@ -89,6 +89,10 @@ class SellerController extends Controller
 
     public function dashboard(Request $request)
     {
+        // Check if user has permission to view dashboard
+        if (!Auth::user()->hasPermissionTo('show-products')) {
+            abort(403, 'Unauthorized');
+        }
         $sellerId = Auth::id();
         $products = Product::where('seller_id', $sellerId)->get();
         // Calculate sales count for each product

@@ -1,0 +1,15 @@
+[req]
+prompt = no
+distinguished_name = dn
+req_extensions = v3_req
+[dn]
+C=EG
+ST=Cairo
+L=Cairo
+O=BiT
+OU=BiT
+CN=bit.local.com
+[v3_req]
+basicConstraints = CA:FALSE
+keyUsage = digitalSignature, keyEncipherment
+subjectAltName = DNS:bit.local.com

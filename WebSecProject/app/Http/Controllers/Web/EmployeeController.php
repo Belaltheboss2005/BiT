@@ -16,7 +16,7 @@ class EmployeeController extends Controller
     // Show all sellers for management and all pending products
     public function manageSellers()
     {
-         if (!Auth::user() || !Auth::user()->can('manage_sellers')) {
+         if (!Auth::user() && !Auth::user()->can('manage_sellers')) {
             abort(403, 'Unauthorized access');
         }
         $sellers = User::role('Seller')->with('products')->get();
@@ -34,7 +34,7 @@ class EmployeeController extends Controller
     // Activate a seller
     public function activateSeller($id)
     {
-        if (!Auth::user() || !Auth::user()->can('manage_sellers')) {
+        if (!Auth::user() && !Auth::user()->can('manage_sellers')) {
             abort(403, 'Unauthorized access');
         }
         $seller = User::findOrFail($id);
@@ -46,7 +46,7 @@ class EmployeeController extends Controller
     // Deactivate a seller
     public function deactivateSeller($id)
     {
-        if (!Auth::user() || !Auth::user()->can('manage_sellers')) {
+        if (!Auth::user() && !Auth::user()->can('manage_sellers')) {
             abort(403, 'Unauthorized access');
         }
         $seller = User::findOrFail($id);
@@ -58,7 +58,7 @@ class EmployeeController extends Controller
     // Show all orders for management
     public function manageOrders()
     {
-        if (!Auth::user() || !Auth::user()->can('manage_orders')) {
+        if (!Auth::user() && !Auth::user()->can('manage_orders')) {
             abort(403, 'Unauthorized access');
         }
         // Show all orders (not just pending) for return requests
@@ -79,7 +79,7 @@ class EmployeeController extends Controller
     // Accept a pending order
     public function acceptOrder($id)
     {
-        if (!Auth::user() || !Auth::user()->can(abilities: 'manage_orders')) {
+        if (!Auth::user() && !Auth::user()->can(abilities: 'manage_orders')) {
             abort(403, 'Unauthorized access');
         }
         $order = Order::findOrFail($id);
@@ -94,7 +94,7 @@ class EmployeeController extends Controller
     // Cancel a pending order
     public function cancelOrder($id)
     {
-        if (!Auth::user() || !Auth::user()->can(abilities: 'manage_orders')) {
+        if (!Auth::user() && !Auth::user()->can(abilities: 'manage_orders')) {
             abort(403, 'Unauthorized access');
         }
         $order = Order::findOrFail($id);
@@ -109,7 +109,7 @@ class EmployeeController extends Controller
     // Approve a pending product
     public function approveProduct($id)
     {
-        if (!Auth::user() || !Auth::user()->can('manage_products')) {
+        if (!Auth::user() && !Auth::user()->can('manage_products')) {
             abort(403, 'Unauthorized access');
         }
         $product = Product::findOrFail($id);
@@ -124,7 +124,7 @@ class EmployeeController extends Controller
     // Deny a pending product
     public function denyProduct($id)
     {
-        if (!Auth::user() || !Auth::user()->can('manage_products')) {
+        if (!Auth::user() && !Auth::user()->can('manage_products')) {
             abort(403, 'Unauthorized access');
         }
         $product = Product::findOrFail($id);
@@ -139,7 +139,7 @@ class EmployeeController extends Controller
     // Put product on hold
     public function holdProduct($id)
     {
-        if (!Auth::user() || !Auth::user()->can('manage_products')) {
+        if (!Auth::user() && !Auth::user()->can('manage_products')) {
             abort(403, 'Unauthorized access');
         }
         $product = Product::findOrFail($id);
@@ -154,7 +154,7 @@ class EmployeeController extends Controller
     // Delete product (only if on hold)
     public function deleteProduct($id)
     {
-        if (!Auth::user() || !Auth::user()->can('manage_products')) {
+        if (!Auth::user() && !Auth::user()->can('manage_products')) {
             abort(403, 'Unauthorized access');
         }
         $product = Product::findOrFail($id);
@@ -168,7 +168,7 @@ class EmployeeController extends Controller
     // Resume (approve) a product that is on hold
     public function resumeProduct($id)
     {
-        if (!Auth::user() || !Auth::user()->can('manage_products')) {
+        if (!Auth::user() && !Auth::user()->can('manage_products')) {
             abort(403, 'Unauthorized access');
         }
         $product = Product::findOrFail($id);

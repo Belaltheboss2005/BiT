@@ -14,7 +14,7 @@ class ProductsController extends Controller
 {
     public function index()
     {
-        if (!Auth::user() || !Auth::user()->can('products_for_customers')) {
+        if (!Auth::user() && !Auth::user()->can('products_for_customers')) {
             abort(403, 'Unauthorized access');
         }
         $products = Product::all();
@@ -23,7 +23,7 @@ class ProductsController extends Controller
 
     public function addToCart(Request $request)
     {
-        if (!Auth::user() || !Auth::user()->can('products_for_customers')) {
+        if (!Auth::user() && !Auth::user()->can('products_for_customers')) {
             abort(403, 'Unauthorized access');
         }
         $request->validate([
@@ -57,7 +57,7 @@ class ProductsController extends Controller
 
     public function viewCart()
     {
-        if (!Auth::user() || !Auth::user()->can('products_for_customers')) {
+        if (!Auth::user() && !Auth::user()->can('products_for_customers')) {
             abort(403, 'Unauthorized access');
         }
         $userId = Auth::id();
@@ -70,7 +70,7 @@ class ProductsController extends Controller
 
     public function removeFromCart($id)
     {
-        if (!Auth::user() || !Auth::user()->can('products_for_customers')) {
+        if (!Auth::user() && !Auth::user()->can('products_for_customers')) {
             abort(403, 'Unauthorized access');
         }
         $userId = Auth::id();
@@ -85,7 +85,7 @@ class ProductsController extends Controller
 
     public function updateCartQuantity(Request $request, $id)
     {
-        if (!Auth::user() || !Auth::user()->can('products_for_customers')) {
+        if (!Auth::user() && !Auth::user()->can('products_for_customers')) {
             abort(403, 'Unauthorized access');
         }
         $userId = Auth::id();
@@ -105,7 +105,7 @@ class ProductsController extends Controller
 
     public function viewCheckout()
     {
-        if (!Auth::user() || !Auth::user()->can('products_for_customers')) {
+        if (!Auth::user() && !Auth::user()->can('products_for_customers')) {
             abort(403, 'Unauthorized access');
         }
         $userId = Auth::id();
@@ -125,7 +125,7 @@ class ProductsController extends Controller
 
     public function placeOrder(Request $request)
     {
-        if (!Auth::user() || !Auth::user()->can('products_for_customers')) {
+        if (!Auth::user() && !Auth::user()->can('products_for_customers')) {
             abort(403, 'Unauthorized access');
         }
         $request->validate([
@@ -177,7 +177,7 @@ class ProductsController extends Controller
 
     public function viewOrders()
     {
-        if (!Auth::user() || !Auth::user()->can('products_for_customers')) {
+        if (!Auth::user() && !Auth::user()->can('products_for_customers')) {
             abort(403, 'Unauthorized access');
         }
         $userId = Auth::id();
@@ -190,7 +190,7 @@ class ProductsController extends Controller
 
     public function requestReturn($orderItemId)
     {
-        if (!Auth::user() || !Auth::user()->can('products_for_customers')) {
+        if (!Auth::user() && !Auth::user()->can('products_for_customers')) {
             abort(403, 'Unauthorized access');
         }
         $orderItem = OrderItem::findOrFail($orderItemId);
@@ -211,7 +211,7 @@ class ProductsController extends Controller
 
     public function cancelOrder($orderId)
     {
-        if (!Auth::user() || !Auth::user()->can('products_for_customers')) {
+        if (!Auth::user() && !Auth::user()->can('products_for_customers')) {
             abort(403, 'Unauthorized access');
         }
         $order = Order::findOrFail($orderId);
@@ -233,7 +233,7 @@ class ProductsController extends Controller
         $orderItem = OrderItem::findOrFail($orderItemId);
         $order = $orderItem->order;
         // Only employees can approve/deny
-        if (!auth()->user() || !auth()->user()->hasPermissionTo('edit_return_requests')) {
+        if (!auth()->user() && !auth()->user()->hasPermissionTo('edit_return_requests')) {
             abort(403, 'Unauthorized');
         }
         if ($orderItem->status !== 'pending return request') {
@@ -256,7 +256,7 @@ class ProductsController extends Controller
     {
         $orderItem = OrderItem::findOrFail($orderItemId);
         // Only employees can approve/deny
-        if (!auth()->user() || !auth()->user()->hasPermissionTo('edit_return_requests')) {
+        if (!auth()->user() && !auth()->user()->hasPermissionTo('edit_return_requests')) {
             abort(403, 'Unauthorized');
         }
         if ($orderItem->status !== 'pending return request') {

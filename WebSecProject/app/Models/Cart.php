@@ -13,14 +13,5 @@ class Cart extends Model
         'updated_at',
     ];
     public $timestamps = true;
-    
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
 
-    public function cartItems()
-    {
-        return $this->hasMany(CartItem::class);
-    }
 }
