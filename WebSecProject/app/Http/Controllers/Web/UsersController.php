@@ -49,6 +49,7 @@ class UsersController extends Controller
         $user = User::where('email', $request->email)->first();
 
         if ($user && $user->hasRole('Banned')) {
+
             return redirect()->route('banned_page');
         }
 

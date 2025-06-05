@@ -31,7 +31,7 @@ if(!Auth::attempt(['email' => $request->email, 'password' => $request->password]
     $user = User::where('email', $request->email)->select('id', 'name', 'email')->first();
     $token = $user->createToken('app');
 return response()->json(['token'=>$token->accessToken, 'user'=>$user->getAttributes()]);
-}    
+}
 
 
 public function users(Request $request) {
@@ -40,6 +40,7 @@ return response()->json(['users'=>$users]);
 }
 public function logout(Request $request) {
     auth()->user()->token()->revoke();
+    return response()->json(['message' => 'Successfully logged out']);
  }
 
 }

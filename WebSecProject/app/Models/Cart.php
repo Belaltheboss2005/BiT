@@ -1,7 +1,8 @@
 <?php
 
 namespace App\Models;
-
+use App\Models\User;
+use App\Models\CartItem;
 use Illuminate\Database\Eloquent\Model;
 
 class Cart extends Model
@@ -12,6 +13,16 @@ class Cart extends Model
         'created_at',
         'updated_at',
     ];
-    public $timestamps = true;
+        public $timestamps = true;
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function cartItems()
+    {
+        return $this->hasMany(CartItem::class);
+    }
 
 }

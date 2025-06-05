@@ -85,6 +85,11 @@ Route::post('password/email', [UsersController::class, 'sendResetPassword'])->na
 Route::get('/password/change', [UsersController::class, 'showChangePasswordForm'])->name('password.change');
 Route::post('/password/change', [UsersController::class, 'updatePassword'])->name('password.update');
 
+// Banned 
+Route::get('banned', function () {
+    return view('users.banned');
+})->name('banned_page');
+
 Route::middleware(['auth'])->group(function () {
     // Users routes
 

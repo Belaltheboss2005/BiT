@@ -21,7 +21,7 @@
                             <a class="nav-link" href="{{ route('seller.manage') }}">Manage Products</a>
                     </li>
                @endif
-               @if (auth()->user()->hasPermissionTo('show-products'))
+               @if (auth()->user()->hasPermissionTo('manage_sellers'))
                     <li class="nav-item">
                             <a class="nav-link" href="{{ route('employee.manage_seller') }}">Manage Sellers</a>
                     </li>

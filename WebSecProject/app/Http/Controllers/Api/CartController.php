@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\API;
 
+
+
 use App\Http\Controllers\Controller;
 use App\Models\Cart;
 use App\Models\CartItem;
@@ -151,4 +153,87 @@ class CartController extends Controller
             'message' => 'Product removed from cart successfully'
         ], 200);
     }
+
+    // public function checkout(Request $request)
+    // {
+    //     $request->validate([
+    //         'address' => 'required|string|max:255',
+    //         'city' => 'required|string|max:100',
+    //         'payment_method' => 'required|string|in:cash_on_delivery,credit_card,online_payment',
+    //     ]);
+
+    //     $cartItems = Cart::where('user_id', auth()->id())->get();
+
+    //     if ($cartItems->isEmpty()) {
+    //         return response()->json([
+    //             'status' => 'error',
+    //             'message' => 'Cart is empty'
+    //         ], 400);
+    //     }
+
+    //     $totalPrice = 0;
+    //     foreach ($cartItems as $item) {
+    //         $product = Product::findOrFail($item->product_id);
+    //         $totalPrice += $product->price * $item->quantity;
+    //     }
+
+    //     $order = Order::create([
+    //         'user_id' => auth()->id(),
+    //         'address' => $request->address,
+    //         'city' => $request->city,
+    //         'payment_method' => $request->payment_method,
+    //         'total_price' => $totalPrice,
+    //         'status' => 'pending',
+    //     ]);
+
+    //     foreach ($cartItems as $item) {
+    //         $order->orderItems()->create([
+    //             'product_id' => $item->product_id,
+    //             'quantity' => $item->quantity,
+    //             'price' => Product::find($item->product_id)->price,
+    //         ]);
+    //         $item->delete(); // حذف المنتج من الـ Cart بعد الـ Checkout
+    //     }
+
+    //     return response()->json([
+    //         'status' => 'success',
+    //         'message' => 'Order placed successfully',
+    //         'data' => $order
+    //     ], 201);
+    // }
+
+    // // عرض الـ Orders
+    // public function index()
+    // {
+    //     $orders = Order::where('user_id', auth()->id())->with('orderItems')->get();
+    //     return response()->json([
+    //         'status' => 'success',
+    //         'data' => $orders
+    //     ], 200);
+    // }
+
+    // public function cancel($id)
+    // {
+    //     $order = Order::where('id', $id)
+    //                   ->where('user_id', auth()->id())
+    //                   ->firstOrFail();
+
+    //     if ($order->status !== 'pending') {
+    //         return response()->json([
+    //             'status' => 'error',
+    //             'message' => 'Only pending orders can be canceled'
+    //         ], 400);
+    //     }
+
+    //     $order->update([
+    //         'status' => 'canceled'
+    //     ]);
+
+    //     return response()->json([
+    //         'status' => 'success',
+    //         'message' => 'Order canceled successfully',
+    //         'data' => $order
+    //     ], 200);
+    // }
 }
+

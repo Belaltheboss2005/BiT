@@ -19,7 +19,6 @@ class ProductController extends Controller
 
     public function store(Request $request)
     {
-        // التأكد إن الـ User مسجل دخول
         if (!auth()->check()) {
             return response()->json([
                 'status' => 'error',
@@ -37,7 +36,7 @@ class ProductController extends Controller
             'name' => $request->name,
             'price' => $request->price,
             'stock' => $request->stock,
-            'seller_id' => auth()->id(), // هنا بيشتغل لأننا تأكدنا إن فيه User
+            'seller_id' => auth()->id(), 
         ]);
 
         return response()->json([
@@ -49,7 +48,6 @@ class ProductController extends Controller
 
     public function update(Request $request, $id)
     {
-        // التأكد إن الـ User مسجل دخول
         if (!auth()->check()) {
             return response()->json([
                 'status' => 'error',
@@ -59,7 +57,6 @@ class ProductController extends Controller
 
         $product = Product::findOrFail($id);
 
-        // التأكد إن الـ User هو الـ Seller بتاع المنتج
         if ($product->seller_id !== auth()->id()) {
             return response()->json([
                 'status' => 'error',
@@ -88,7 +85,6 @@ class ProductController extends Controller
 
     public function destroy($id)
     {
-        // التأكد إن الـ User مسجل دخول
         if (!auth()->check()) {
             return response()->json([
                 'status' => 'error',
@@ -98,7 +94,6 @@ class ProductController extends Controller
 
         $product = Product::findOrFail($id);
 
-        // التأكد إن الـ User هو الـ Seller بتاع المنتج
         if ($product->seller_id !== auth()->id()) {
             return response()->json([
                 'status' => 'error',
