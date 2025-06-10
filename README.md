@@ -1,6 +1,6 @@
-## WebSecProject Overview (BiT)
+## Web Security Project (BiT)
 
-Based on the workspace structure and files, this project is a Laravel-based web application named **"WebSecProject"**. Its primary purpose appears to be educational, likely for learning or demonstrating web and security technologies.
+This project is a Laravel-based web application named **"BiT"**. Its primary purpose is to make a secure online shopping website using laravel.
 
 ### Project Features
 
@@ -12,8 +12,8 @@ Based on the workspace structure and files, this project is a Laravel-based web 
   - Orders and products
   - Password resets  
   These indicate features like user management, secure authentication, and e-commerce functionality.
-- Email verification support, as seen in `App\Mail\VerificationEmail`.
-- Security-focused configuration, such as environment variables and SSL certificates in the `certificate/` directory.
+- Email verification support.
+- Security-focused configuration, such as environment variables and SSL certificates.
 
 ### Purpose
 
